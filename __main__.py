@@ -120,7 +120,7 @@ plot_compare(
     "data/l_snapshot.csv",
     "data/l_interp.csv",
     "L-Shaped Scene",
-    5000,
+    2000,
     "l_compare.pgf",
     doShow=show,
 )
