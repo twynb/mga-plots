@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import argparse
+import math
 
 
 def plot_csv(
@@ -86,10 +87,34 @@ def setup_ax(len: int, ax):
     ax.set_xlabel("Sample")
 
 
+C50_LIMIT = int(44100 * 50 / 1000)
+"""
+44100 samples * 50 milliseconds
+"""
+
+
+def print_c50(fname: str, name: str):
+    values = parse_values_from_file(fname)
+    c50 = c50_from_values(values)
+    print(name + ": " + str(c50))
+
+
+def c50_from_values(values: list):
+    index = 0
+    while values[index] == 0:
+        index += 1
+    values = values[index:]
+    before_limit = sum(values[:C50_LIMIT])
+    after_limit = sum(values[(C50_LIMIT + 1) :])
+    return 10 * math.log10(before_limit / after_limit)
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--show", action="store_true")
+parser.add_argument("-np", "--noplots", action="store_true")
 args = parser.parse_args()
 show = args.show
+no_plots = args.noplots
 
 if not show:
     mpl.use("pgf")
@@ -102,25 +127,30 @@ if not show:
         }
     )
 
+if not no_plots:
+    plot_csv("data/cube_snapshot.csv", "Cube Snapshot", 5000, "cube_snapshot.pgf", show)
+    plot_csv("data/cube_interp.csv", "Cube Interpolated", 5000, "cube_interp.pgf", show)
+    plot_csv("data/l_snapshot.csv", "L Snapshot", 2000, "l_snapshot.pgf", show)
+    plot_csv("data/l_interp.csv", "L Interpolated", 2000, "l_interp.pgf", show)
 
-plot_csv("data/cube_snapshot.csv", "Cube Snapshot", 5000, "cube_snapshot.pgf", show)
-plot_csv("data/cube_interp.csv", "Cube Interpolated", 5000, "cube_interp.pgf", show)
-plot_csv("data/l_snapshot.csv", "L Snapshot", 2000, "l_snapshot.pgf", show)
-plot_csv("data/l_interp.csv", "L Interpolated", 2000, "l_interp.pgf", show)
+    plot_compare(
+        "data/cube_snapshot.csv",
+        "data/cube_interp.csv",
+        "Cube Scene",
+        5000,
+        "cube_compare.pgf",
+        doShow=show,
+    )
+    plot_compare(
+        "data/l_snapshot.csv",
+        "data/l_interp.csv",
+        "L-Shaped Scene",
+        2000,
+        "l_compare.pgf",
+        doShow=show,
+    )
 
-plot_compare(
-    "data/cube_snapshot.csv",
-    "data/cube_interp.csv",
-    "Cube Scene",
-    5000,
-    "cube_compare.pgf",
-    doShow=show,
-)
-plot_compare(
-    "data/l_snapshot.csv",
-    "data/l_interp.csv",
-    "L-Shaped Scene",
-    2000,
-    "l_compare.pgf",
-    doShow=show,
-)
+print_c50("data/cube_snapshot.csv", "Cube Snapshot")
+print_c50("data/cube_interp.csv", "Cube Interp")
+print_c50("data/l_snapshot.csv", "L Snapshot")
+print_c50("data/l_interp.csv", "L Interp")
