@@ -77,7 +77,7 @@ def plot_all_values(values: list, title: str, ax):
 def plot_first_n_values(values: list, title: str, smaller_plot_size: int, ax):
     setup_ax(smaller_plot_size, ax)
     ax.plot(values[:smaller_plot_size])
-    ax.set_title(title + " (first " + str(smaller_plot_size) + " samples)")
+    ax.set_title(f"{title} (first {str(smaller_plot_size)} samples)")
 
 
 def setup_ax(len: int, ax):
@@ -96,7 +96,7 @@ C50_LIMIT = int(44100 * 50 / 1000)
 def print_c50(fname: str, name: str):
     values = parse_values_from_file(fname)
     c50 = c50_from_values(values)
-    print(name + ": " + str(c50))
+    print(f"{name}: {str(c50)}")
 
 
 def c50_from_values(values: list):
@@ -128,29 +128,35 @@ if not show:
     )
 
 if not no_plots:
-    plot_csv("data/cube_snapshot.csv", "Cube Snapshot", 5000, "cube_snapshot.pgf", show)
-    plot_csv("data/cube_interp.csv", "Cube Interpolated", 5000, "cube_interp.pgf", show)
-    plot_csv("data/l_snapshot.csv", "L Snapshot", 2000, "l_snapshot.pgf", show)
-    plot_csv("data/l_interp.csv", "L Interpolated", 2000, "l_interp.pgf", show)
+    plot_csv(
+        "data/cube_snapshot_1.csv", "Cube Snapshot", 5000, "cube_snapshot.pgf", show
+    )
+    plot_csv(
+        "data/cube_interp_1.csv", "Cube Interpolated", 5000, "cube_interp.pgf", show
+    )
+    plot_csv("data/l_snapshot_1.csv", "L Snapshot", 2000, "l_snapshot.pgf", show)
+    plot_csv("data/l_interp_1.csv", "L Interpolated", 2000, "l_interp.pgf", show)
 
     plot_compare(
-        "data/cube_snapshot.csv",
-        "data/cube_interp.csv",
+        "data/cube_snapshot_1.csv",
+        "data/cube_interp_1.csv",
         "Cube Scene",
         5000,
         "cube_compare.pgf",
         doShow=show,
     )
     plot_compare(
-        "data/l_snapshot.csv",
-        "data/l_interp.csv",
+        "data/l_snapshot_1.csv",
+        "data/l_interp_1.csv",
         "L-Shaped Scene",
         2000,
         "l_compare.pgf",
         doShow=show,
     )
 
-print_c50("data/cube_snapshot.csv", "Cube Snapshot")
-print_c50("data/cube_interp.csv", "Cube Interp")
-print_c50("data/l_snapshot.csv", "L Snapshot")
-print_c50("data/l_interp.csv", "L Interp")
+for idx in range(1, 4):
+    print(f"Running tests for {str(idx)}")
+    print_c50(f"data/cube_snapshot_{str(idx)}.csv", "Cube Snapshot")
+    print_c50(f"data/cube_interp_{str(idx)}.csv", "Cube Interp")
+    print_c50(f"data/l_snapshot_{str(idx)}.csv", "L Snapshot")
+    print_c50(f"data/l_interp_{str(idx)}.csv", "L Interp")
